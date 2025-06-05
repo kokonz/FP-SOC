@@ -101,16 +101,49 @@
             <span>{{ currentIP.geoLocation.asn }}</span>
           </div>
         </div>
-      </div>
+      </div>      <!-- Threat Analysis -->
+      <div class="card threat-analysis-card">
+        <h3>Threat Analysis</h3>
+        <div class="threat-summary">
+          <div class="threat-severity" :class="getThreatSeverityClass(currentIP?.aiAnalysis?.riskLevel)">
+            <h4>Threat Severity</h4>
+            <div class="severity-score" :class="{ 'pulse': currentIP?.aiAnalysis?.riskScore >= 80 }">
+              {{ currentIP?.aiAnalysis?.riskScore || 0 }}
+              <span class="severity-label">/ 100</span>
+            </div>
+            <div class="severity-level">{{ currentIP?.aiAnalysis?.riskLevel || 'LOW' }}</div>
+          </div>
+          <div class="threat-types">
+            <h4>Threat Classification</h4>
+            <div class="threat-tags">
+              <span 
+                v-for="(type, index) in (currentIP?.aiAnalysis?.threatTypes || ['None Detected'])" 
+                :key="index" 
+                class="threat-tag"
+                :class="getThreatTypeClass(type)"
+                :title="getThreatTypeDescription(type)"
+              >
+                {{ type }}
+              </span>
+            </div>
+          </div>
+        </div>
 
-      <!-- Services and Ports -->
-      <div class="card services-card">
-        <h3>Exposed Services</h3>
-        <div class="services-list">
-          <div v-for="(port, index) in currentIP.services.ports" :key="index" class="service-item">
-            <span class="port">Port {{ port }}</span>
-            <span class="protocol">{{ currentIP.services.protocols[index] || 'Unknown' }}</span>
-            <span class="banner">{{ currentIP.services.banners[index] || 'No banner' }}</span>
+        <div class="threat-details">
+          <div class="threat-timeline">
+            <h4>Analysis Timeline</h4>
+            <div class="timeline-item">
+              <span class="timeline-label">First Detection:</span>
+              <span class="timeline-value">{{ currentIP?.firstSeen ? formatDate(currentIP.firstSeen) : 'Not detected' }}</span>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-label">Last Analyzed:</span>
+              <span class="timeline-value">{{ currentIP?.aiAnalysis?.lastAnalyzed ? formatDate(currentIP.aiAnalysis.lastAnalyzed) : 'Not analyzed yet' }}</span>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-label">Detection Count:</span>
+              <span class="timeline-value">{{ currentIP?.reputation?.virusTotal?.detections?.length || 0 }} sources</span>
+            </div>
           </div>
         </div>
       </div>
@@ -220,6 +253,39 @@ const getScoreClass = (score: number) => {
   if (score >= 60) return 'score-high';
   if (score >= 40) return 'score-medium';
   return 'score-low';
+};
+
+const getThreatSeverityClass = (level: string | undefined) => {
+  if (!level) return 'severity-low';
+  
+  switch (level.toUpperCase()) {
+    case 'CRITICAL': return 'severity-critical';
+    case 'HIGH': return 'severity-high';
+    case 'MEDIUM': return 'severity-medium';
+    default: return 'severity-low';
+  }
+};
+
+const getThreatTypeDescription = (type: string): string => {
+  const descriptions: Record<string, string> = {
+    'Malicious Activity': 'Known malicious behavior or attacks detected',
+    'Community Reported Threats': 'Reports from security community members',
+    'Security Vendor Detections': 'Detections from antivirus and security vendors',
+    'Reported Abuse': 'Reported network abuse or malicious activities',
+    'None Detected': 'No threats detected at this time'
+  };
+  return descriptions[type] || 'Unknown threat type';
+};
+
+const getThreatTypeClass = (type: string): string => {
+  const typeMap: Record<string, string> = {
+    'Malicious Activity': 'type-malicious',
+    'Community Reported Threats': 'type-community',
+    'Security Vendor Detections': 'type-security',
+    'Reported Abuse': 'type-abuse',
+    'None Detected': 'type-none'
+  };
+  return typeMap[type] || 'type-default';
 };
 
 const investigate = async () => {
@@ -365,13 +431,127 @@ const stopMonitoring = async () => {
   border-radius: 0.375rem;
 }
 
-.service-item {
+.threat-analysis-card {
+  grid-column: 1 / -1;
+}
+
+.threat-summary {
   display: grid;
-  grid-template-columns: auto 1fr 2fr;
-  gap: 1rem;
-  padding: 0.5rem;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.threat-severity {
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
   background: var(--background-color);
-  border-radius: 0.375rem;
+}
+
+.severity-score {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 1rem 0;
+}
+
+.severity-label {
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.severity-level {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.threat-types {
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  background: var(--background-color);
+}
+
+.threat-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.threat-tag {
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.threat-details {
+  margin-top: 1.5rem;
+}
+
+.threat-timeline {
+  padding: 1rem;
+  background: var(--background-color);
+  border-radius: 0.5rem;
+}
+
+.timeline-item {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+/* Severity Classes */
+.severity-critical {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+.severity-high {
+  background: rgba(234, 88, 12, 0.1);
+  color: #ea580c;
+}
+
+.severity-medium {
+  background: rgba(234, 179, 8, 0.1);
+  color: #ea580c;
+}
+
+.severity-low {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+/* Threat Type Classes */
+.type-malicious {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+.type-community {
+  background: rgba(234, 88, 12, 0.1);
+  color: #ea580c;
+}
+
+.type-security {
+  background: rgba(234, 179, 8, 0.1);
+  color: #eab308;
+}
+
+.type-abuse {
+  background: rgba(147, 51, 234, 0.1);
+  color: #9333ea;
+}
+
+.type-none {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+.type-default {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
 }
 
 .ai-analysis-card {

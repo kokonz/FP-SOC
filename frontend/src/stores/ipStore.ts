@@ -8,6 +8,13 @@ interface IPData {
   firstSeen: string;
   lastSeen: string;
   status: 'ACTIVE' | 'BLOCKED' | 'MONITORING';
+  scanningActivities?: {
+    sshAttempts: number;
+    nmapScans: number;
+    portScans: number;
+    scannerIPs: string[];
+    lastDetected?: string;
+  };
   reputation: {
     virusTotal: {
       score: number;

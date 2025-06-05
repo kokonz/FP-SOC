@@ -22,11 +22,17 @@ export interface IIP extends Document {
     coordinates: [number, number];
     isp: string;
     asn: string;
-  };
-  services: {
+  };  services: {
     ports: number[];
     protocols: string[];
     banners: string[];
+  };
+  scanningActivities: {
+    sshAttempts: number;
+    nmapScans: number;
+    portScans: number;
+    scannerIPs: string[];
+    lastDetected: Date;
   };
   monitoring: {
     enabled: boolean;

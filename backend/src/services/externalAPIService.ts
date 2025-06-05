@@ -284,31 +284,115 @@ export class ExternalAPIService {
       logger.error('LLM Analysis error:', error);
       return this.getFallbackAnalysis(data);
     }
-  }
-
-  private getFallbackAnalysis(data: any): AIAnalysisResponse {
-    // Calculate a basic risk score based on available data
+  }  private getFallbackAnalysis(data: any): AIAnalysisResponse {
     let riskScore = 0;
     let findings: string[] = [];
     let recommendations: string[] = [];
+    let threatTypes: string[] = [];
 
-    // Check VirusTotal data
-    if (data.virusTotal?.reputation !== undefined) {
-      const vtScore = data.virusTotal.reputation;
-      if (vtScore < 0) {
-        riskScore += 30;
-        findings.push('Negative reputation score from VirusTotal');
-        recommendations.push('Investigate historical malicious activities');
+    // Analyze Network Scanning Activities
+    if (data.scanningActivities) {
+      const { sshAttempts = 0, nmapScans = 0, portScans = 0, scannerIPs = [] } = data.scanningActivities;
+      
+      // SSH Brute Force Detection
+      if (sshAttempts > 0) {
+        riskScore += Math.min(sshAttempts * 2, 30); // Cap at 30 points
+        threatTypes.push('SSH Brute Force Attempts');
+        findings.push(`Detected ${sshAttempts} SSH login attempts`);
+        if (scannerIPs.length > 0) {
+          findings.push(`SSH attack source IPs: ${scannerIPs.join(', ')}`);
+        }
+        recommendations.push('Implement SSH key-based authentication only');
+        recommendations.push('Consider implementing fail2ban for SSH protection');
+        recommendations.push('Enable SSH access logging and monitoring');
+      }
+      
+      // NMAP Scanning Detection
+      if (nmapScans > 0) {
+        riskScore += 25; // Significant risk for active scanning
+        threatTypes.push('Port Scanning (NMAP)');
+        findings.push(`Detected ${nmapScans} NMAP scanning activities`);
+        recommendations.push('Implement strict firewall rules');
+        recommendations.push('Enable IDS/IPS monitoring');
+      }
+      
+      // Port Scanning Detection
+      if (portScans > 0) {
+        riskScore += Math.min(portScans * 3, 20); // Cap at 20 points
+        threatTypes.push('Generic Port Scanning');
+        findings.push(`Detected ${portScans} port scanning attempts`);
+        recommendations.push('Review and restrict open ports');
+        recommendations.push('Implement port knocking for sensitive services');
+      }
+
+      if (nmapScans > 0) {
+        riskScore += Math.min(nmapScans * 5, 25); // Cap at 25 points
+        threatTypes.push('Port Scanning Activity');
+        findings.push(`Detected ${nmapScans} Nmap scan attempts`);
+        if (scannerIPs.length > 0) {
+          findings.push(`Scan origins: ${scannerIPs.join(', ')}`);
+        }
+        recommendations.push('Implement port scan detection and blocking');
+        recommendations.push('Consider implementing IDS/IPS solutions');
+      }
+
+      if (portScans > 0) {
+        threatTypes.push('Reconnaissance Activity');
+        findings.push(`Detected ${portScans} general port scan attempts`);
       }
     }
 
-    // Check AbuseIPDB data
-    if (data.abuseIPDB?.abuseConfidenceScore !== undefined) {
+    // Analyze VirusTotal data
+    if (data.virusTotal) {
+      // Check reputation
+      const vtScore = data.virusTotal.reputation;
+      if (vtScore !== undefined) {
+        if (vtScore < 0) {
+          riskScore += Math.abs(vtScore);
+          threatTypes.push('Malicious Activity');
+          findings.push(`Negative reputation score (${vtScore}) from VirusTotal`);
+        }
+      }
+
+      // Check malicious votes
+      if (data.virusTotal.total_votes) {
+        const maliciousRatio = data.virusTotal.total_votes.malicious / 
+          (data.virusTotal.total_votes.harmless + data.virusTotal.total_votes.malicious);
+        if (maliciousRatio > 0.3) {
+          riskScore += maliciousRatio * 50;
+          threatTypes.push('Community Reported Threats');
+          findings.push(`High malicious vote ratio: ${(maliciousRatio * 100).toFixed(1)}%`);
+        }
+      }
+
+      // Check analysis stats
+      if (data.virusTotal.last_analysis_stats) {
+        const stats = data.virusTotal.last_analysis_stats;
+        const detectionRatio = (stats.malicious + stats.suspicious) / 
+          (stats.harmless + stats.undetected + stats.malicious + stats.suspicious);
+        if (detectionRatio > 0.1) {
+          riskScore += detectionRatio * 40;
+          threatTypes.push('Security Vendor Detections');
+          findings.push(`Detected as malicious by ${stats.malicious} security vendors`);
+        }
+      }
+    }
+
+    // Analyze AbuseIPDB data
+    if (data.abuseIPDB) {
       const abuseScore = data.abuseIPDB.abuseConfidenceScore;
-      riskScore += (abuseScore * 0.3); // Convert to 0-30 scale
-      if (abuseScore > 50) {
-        findings.push(`High abuse confidence score: ${abuseScore}%`);
-        recommendations.push('Monitor for abusive behavior');
+      if (abuseScore !== undefined) {
+        riskScore += (abuseScore * 0.4);
+        if (abuseScore > 25) {
+          threatTypes.push('Reported Abuse');
+          findings.push(`AbuseIPDB confidence score: ${abuseScore}%`);
+        }
+      }
+
+      // Check recent reports
+      if (data.abuseIPDB.totalReports && data.abuseIPDB.totalReports > 0) {
+        findings.push(`Total abuse reports: ${data.abuseIPDB.totalReports}`);
+        recommendations.push('Review recent abuse reports and implement necessary blocks');
       }
     }
 
@@ -321,6 +405,22 @@ export class ExternalAPIService {
         findings.push(`Exposed sensitive ports: ${dangerousPorts.join(', ')}`);
         recommendations.push('Review and secure exposed network services');
       }
+    }    // Add default recommendations based on threat types
+    if (threatTypes.includes('Malicious Activity')) {
+      recommendations.push('Implement immediate IP blocking at the firewall level');
+      recommendations.push('Monitor for similar patterns from related IP ranges');
+    }
+    if (threatTypes.includes('Community Reported Threats')) {
+      recommendations.push('Review community reports for specific threat behaviors');
+      recommendations.push('Consider implementing rate limiting for this IP');
+    }
+    if (threatTypes.includes('Security Vendor Detections')) {
+      recommendations.push('Update security rules and signatures');
+      recommendations.push('Enable enhanced logging for connections from this IP');
+    }
+    if (threatTypes.includes('Reported Abuse')) {
+      recommendations.push('Implement progressive security measures based on abuse patterns');
+      recommendations.push('Consider implementing CAPTCHA or additional verification for this IP');
     }
 
     // Determine risk level based on final score
@@ -330,15 +430,18 @@ export class ExternalAPIService {
     else if (riskScore >= 25) riskLevel = "MEDIUM";
 
     if (findings.length === 0) {
-      findings = ['Limited data available for analysis'];
-      recommendations = ['Continue monitoring for changes in behavior'];
+      findings = ['No immediate threats detected'];
+      recommendations = ['Maintain standard security monitoring'];
+      threatTypes = ['None Detected'];
     }
 
     return {
       riskLevel,
       riskScore: Math.min(Math.round(riskScore), 100),
       findings,
-      recommendations
+      recommendations,
+      threatTypes,
+      lastAnalyzed: new Date().toISOString()
     };
   }
 

@@ -7,4 +7,6 @@ export interface AIAnalysisResponse {
   riskScore: number;
   findings: string[];
   recommendations: string[];
+  threatTypes: string[];
+  lastAnalyzed: string;
 }
