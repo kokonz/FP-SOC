@@ -1,0 +1,12 @@
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T14:15:15.921Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T14:15:15.924Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T14:15:15.924Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T14:15:15.925Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T14:15:51.878Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T14:15:51.881Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T14:15:51.881Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T14:15:51.882Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T14:17:48.472Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T14:17:48.474Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T14:17:48.475Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T14:17:48.475Z"}
