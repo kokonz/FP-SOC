@@ -60,12 +60,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 import { useIPStore } from '../stores/ipStore';
 import { formatDate } from '../utils/dateFormatter';
 
 const ipStore = useIPStore();
+const router = useRouter();
 const { monitoredIPs } = storeToRefs(ipStore);
 
 const getRiskLevel = (score: number) => {
@@ -90,8 +92,7 @@ const getScoreClass = (score: number) => {
 };
 
 const viewDetails = (ip: any) => {
-  // TODO: Implement view details functionality
-  console.log('View details for IP:', ip.address);
+  router.push({ name: 'IPDetails', params: { address: ip.address } });
 };
 
 const stopMonitoring = async (address: string) => {

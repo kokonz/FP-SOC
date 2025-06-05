@@ -22,12 +22,33 @@ export class IPInvestigationService {
         this.externalAPIService.getShodanData(address)
       ]);
 
-      // Prepare data for AI analysis
+      // Prepare data for AI analysis with proper fallback values
       const analysisData = {
-        virusTotal: vtData,
-        abuseIPDB: abuseData,
-        geoIP: geoData,
-        shodan: shodanData
+        virusTotal: vtData || { reputation: 0 },
+        abuseIPDB: abuseData || { 
+          ipAddress: address,
+          isPublic: true,
+          ipVersion: 4,
+          isWhitelisted: false,
+          abuseConfidenceScore: 0
+        },
+        geoIP: geoData || {
+          status: "success",
+          country: "Unknown",
+          countryCode: "XX",
+          region: "Unknown",
+          regionName: "Unknown",
+          city: "Unknown",
+          zip: "Unknown",
+          lat: 0,
+          lon: 0,
+          timezone: "Unknown",
+          isp: "Unknown",
+          org: "Unknown",
+          as: "Unknown",
+          query: address
+        },
+        shodan: shodanData || { ip_str: address }
       };
 
       // Get AI analysis
@@ -51,16 +72,19 @@ export class IPInvestigationService {
           }
         },
         geoLocation: {
-          country: geoData?.country,
-          city: geoData?.city,
-          coordinates: [geoData?.longitude || 0, geoData?.latitude || 0],
-          isp: geoData?.isp,
-          asn: geoData?.asn
+          country: geoData?.country || 'Unknown',
+          city: geoData?.city || 'Unknown',
+          coordinates: [
+            geoData?.longitude ?? geoData?.lon ?? 0,
+            geoData?.latitude ?? geoData?.lat ?? 0
+          ],
+          isp: geoData?.isp || 'Unknown',
+          asn: geoData?.asn || geoData?.as?.split(' ')[0] || 'Unknown'
         },
         services: {
           ports: shodanData?.ports || [],
-          protocols: shodanData?.protocols || [],
-          banners: shodanData?.banners || []
+          protocols: shodanData?.data?.map(d => d.protocol || '').filter(Boolean) || [],
+          banners: shodanData?.data?.map(d => d.data || '').filter(Boolean) || []
         },
         aiAnalysis: {
           riskScore,
@@ -154,17 +178,37 @@ export class IPInvestigationService {
     recommendations: string[];
   } {
     try {
+      // Handle the case where analysis is already structured
+      if (analysis && typeof analysis === 'object' && 'riskScore' in analysis) {
+        return {
+          riskScore: Number(analysis.riskScore) || 0,
+          findings: Array.isArray(analysis.findings) ? analysis.findings : [],
+          recommendations: Array.isArray(analysis.recommendations) ? analysis.recommendations : []
+        };
+      }
+
+      // If analysis is null or invalid
+      if (!analysis) {
+        logger.warn('AI analysis returned null or invalid response');
+        return {
+          riskScore: 0,
+          findings: ['Unable to perform AI analysis'],
+          recommendations: ['Please try again later']
+        };
+      }
+
+      // Return the default values if the analysis cannot be parsed
       return {
-        riskScore: analysis.riskScore || 0,
-        findings: analysis.findings || [],
-        recommendations: analysis.recommendations || []
+        riskScore: 0,
+        findings: ['Error parsing AI analysis results'],
+        recommendations: ['System is still operational but AI analysis is limited']
       };
     } catch (error) {
       logger.error('Error parsing AI analysis:', error);
       return {
         riskScore: 0,
-        findings: [],
-        recommendations: []
+        findings: ['Error in AI analysis processing'],
+        recommendations: ['Manual investigation recommended']
       };
     }
   }

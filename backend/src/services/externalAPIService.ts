@@ -2,6 +2,8 @@ import axios from 'axios';
 import NodeCache from 'node-cache';
 import { Groq } from 'groq-sdk';
 import { logger } from '../utils/logger';
+import { ShodanResponse, VirusTotalResponse, AbuseIPDBResponse, GeoIPResponse } from '../types/api';
+import { AIAnalysisResponse, RiskLevel } from '../types/analysis';
 
 const cache = new NodeCache({ stdTTL: 3600 });
 
@@ -58,17 +60,10 @@ export class ExternalAPIService {
         logger.warn(`IPGEO_API_KEY environment variable is missing or invalid. Current raw value: "${geoKey}"`);
     }
   }
-  
-  async getVirusTotalData(ip: string) {
+    async getVirusTotalData(ip: string): Promise<VirusTotalResponse | null> {
     try {
-      // Check if API key is available and valid
-      if (!this.virusTotalKey || this.virusTotalKey === '') {
-        logger.error('Cannot fetch VirusTotal data: API key is not configured');
-        return null;
-      }
-
       const cacheKey = `vt_${ip}`;
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<VirusTotalResponse>(cacheKey);
       if (cached) {
         logger.info(`Retrieved VirusTotal data for IP ${ip} from cache`);
         return cached;
@@ -99,11 +94,10 @@ export class ExternalAPIService {
       return null;
     }
   }
-
-  async getAbuseIPDBData(ip: string) {
+  async getAbuseIPDBData(ip: string): Promise<AbuseIPDBResponse | null> {
     try {
       const cacheKey = `abuse_${ip}`;
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<AbuseIPDBResponse>(cacheKey);
       if (cached) return cached;
 
       const response = await axios.get('https://api.abuseipdb.com/api/v2/check', {
@@ -111,7 +105,7 @@ export class ExternalAPIService {
         headers: { 'Key': this.abuseIPDBKey }
       });
 
-      const data = response.data.data;
+      const data: AbuseIPDBResponse = response.data.data;
       cache.set(cacheKey, data);
       return data;
     } catch (error) {
@@ -119,32 +113,71 @@ export class ExternalAPIService {
       return null;
     }
   }
-
-  async getGeoIPData(ip: string) {
+  async getGeoIPData(ip: string): Promise<GeoIPResponse | null> {
     try {
       const cacheKey = `geo_${ip}`;
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<GeoIPResponse>(cacheKey);
       if (cached) return cached;
 
       const response = await axios.get(`http://ip-api.com/json/${ip}`);
-      cache.set(cacheKey, response.data);
-      return response.data;
+      const data: GeoIPResponse = response.data;
+      cache.set(cacheKey, data);
+      return data;
     } catch (error) {
       logger.error(`GeoIP API error for IP ${ip}:`, error);
       return null;
     }
-  }
-  async getShodanData(ip: string) {
+  }  async getShodanData(ip: string): Promise<ShodanResponse | null> {
     try {
       const cacheKey = `shodan_${ip}`;
-      const cached = cache.get(cacheKey);
-      if (cached) return cached;
+      const cached = cache.get<ShodanResponse>(cacheKey);
+      if (cached) {
+        logger.info(`Retrieved Shodan data for IP ${ip} from cache`);
+        return cached;
+      }
 
-      const response = await axios.get(`https://api.shodan.io/shodan/host/${ip}?key=${this.shodanKey}`);
-      cache.set(cacheKey, response.data);
-      return response.data;
-    } catch (error) {
-      logger.error(`Shodan API error for IP ${ip}:`, error);
+      if (!this.shodanKey || this.shodanKey.trim() === '') {
+        logger.error('Shodan API key is not configured');
+        return null;
+      }
+
+      const cleanKey = this.shodanKey.trim();
+      const response = await axios.get(`https://api.shodan.io/shodan/host/${ip}`, {
+        headers: {
+          'User-Agent': 'IPInvestigatorTool/1.0',
+          'Accept': 'application/json'
+        },
+        params: {
+          key: cleanKey,
+          minify: false
+        }
+      });
+
+      if (!response.data || typeof response.data !== 'object') {
+        logger.error(`Invalid response from Shodan API for IP ${ip}`);
+        return null;
+      }
+
+      const data: ShodanResponse = {
+        ip_str: ip,
+        ...response.data
+      };
+
+      cache.set(cacheKey, data);
+      return data;
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          logger.error(`Shodan API authentication failed for key: ${this.shodanKey.substring(0, 5)}...`);
+          logger.error('Please check if your Shodan API key is valid and has sufficient credits.');
+        } else if (error.response?.status === 404) {
+          logger.info(`No Shodan data found for IP ${ip}`);
+        } else {
+          logger.error(`Shodan API error for IP ${ip}: ${error.response?.status} - ${error.message}`);
+        }
+      } else {
+        logger.error(`Unexpected error while fetching Shodan data for IP ${ip}:`, error);
+      }
       return null;
     }
   }
@@ -201,24 +234,127 @@ export class ExternalAPIService {
       return null;
     }
   }
-  async analyzeWithLLM(data: any) {
+  async analyzeWithLLM(data: any): Promise<AIAnalysisResponse> {
     try {
-      const prompt = `Analyze this IP investigation data and provide:
-      1. Risk assessment (LOW/MEDIUM/HIGH/CRITICAL)
-      2. Key findings summary
-      3. Recommended actions
+      const userPrompt = `Analyze this IP address data as a cybersecurity expert and assess its risk level:
+      ${JSON.stringify(data, null, 2)}
       
-      Data: ${JSON.stringify(data)}`;
+      Provide a detailed analysis with:
+      1. The overall risk level (LOW/MEDIUM/HIGH/CRITICAL)
+      2. A risk score from 0-100
+      3. Key findings about potential threats or security concerns
+      4. Specific recommendations for risk mitigation
+
+      Format your response as valid JSON with the following structure:
+      {
+        "riskLevel": "LOW"|"MEDIUM"|"HIGH"|"CRITICAL",
+        "riskScore": number,
+        "findings": string[],
+        "recommendations": string[]
+      }`;
 
       const completion = await this.groq.chat.completions.create({
-        messages: [{ role: "user", content: prompt }],
-        model: "mixtral-8x7b-32768",
+        messages: [{ role: "user", content: userPrompt }],
+        model: "deepseek-r1-distill-llama-70b",
+        temperature: 0.5,
+        max_tokens: 2000,
+        top_p: 0.95,
+        response_format: { type: "json_object" },
+        reasoning_format: "hidden"
       });
 
-      return completion.choices[0]?.message?.content;
+      const content = completion.choices[0]?.message?.content;
+      if (!content) {
+        logger.warn('Empty response from LLM, using fallback analysis');
+        return this.getFallbackAnalysis(data);
+      }
+
+      try {
+        const parsedResponse = JSON.parse(content);
+        if (!this.isValidAnalysisResponse(parsedResponse)) {
+          logger.warn('Invalid LLM response format:', parsedResponse);
+          return this.getFallbackAnalysis(data);
+        }
+        return parsedResponse;
+      } catch (parseError) {
+        logger.error('Failed to parse LLM response:', parseError);
+        return this.getFallbackAnalysis(data);
+      }
     } catch (error) {
       logger.error('LLM Analysis error:', error);
-      return null;
+      return this.getFallbackAnalysis(data);
     }
+  }
+
+  private getFallbackAnalysis(data: any): AIAnalysisResponse {
+    // Calculate a basic risk score based on available data
+    let riskScore = 0;
+    let findings: string[] = [];
+    let recommendations: string[] = [];
+
+    // Check VirusTotal data
+    if (data.virusTotal?.reputation !== undefined) {
+      const vtScore = data.virusTotal.reputation;
+      if (vtScore < 0) {
+        riskScore += 30;
+        findings.push('Negative reputation score from VirusTotal');
+        recommendations.push('Investigate historical malicious activities');
+      }
+    }
+
+    // Check AbuseIPDB data
+    if (data.abuseIPDB?.abuseConfidenceScore !== undefined) {
+      const abuseScore = data.abuseIPDB.abuseConfidenceScore;
+      riskScore += (abuseScore * 0.3); // Convert to 0-30 scale
+      if (abuseScore > 50) {
+        findings.push(`High abuse confidence score: ${abuseScore}%`);
+        recommendations.push('Monitor for abusive behavior');
+      }
+    }
+
+    // Check Shodan data
+    if (data.shodan?.ports?.length) {
+      const commonDangerousPorts = [21, 22, 23, 3389, 445, 135, 137, 138, 139];
+      const dangerousPorts = data.shodan.ports.filter((p: number) => commonDangerousPorts.includes(p));
+      if (dangerousPorts.length > 0) {
+        riskScore += (dangerousPorts.length * 5);
+        findings.push(`Exposed sensitive ports: ${dangerousPorts.join(', ')}`);
+        recommendations.push('Review and secure exposed network services');
+      }
+    }
+
+    // Determine risk level based on final score
+    let riskLevel: RiskLevel = "LOW";
+    if (riskScore >= 75) riskLevel = "CRITICAL";
+    else if (riskScore >= 50) riskLevel = "HIGH";
+    else if (riskScore >= 25) riskLevel = "MEDIUM";
+
+    if (findings.length === 0) {
+      findings = ['Limited data available for analysis'];
+      recommendations = ['Continue monitoring for changes in behavior'];
+    }
+
+    return {
+      riskLevel,
+      riskScore: Math.min(Math.round(riskScore), 100),
+      findings,
+      recommendations
+    };
+  }
+
+  private isValidAnalysisResponse(response: any): response is AIAnalysisResponse {
+    const validRiskLevels: RiskLevel[] = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+    return (
+      response &&
+      typeof response === 'object' &&
+      validRiskLevels.includes(response.riskLevel) &&
+      typeof response.riskScore === 'number' &&
+      response.riskScore >= 0 &&
+      response.riskScore <= 100 &&
+      Array.isArray(response.findings) &&
+      Array.isArray(response.recommendations) &&
+      response.findings.every((f: any) => typeof f === 'string') &&
+      response.recommendations.every((r: any) => typeof r === 'string')
+    );
   }
 }

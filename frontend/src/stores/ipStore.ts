@@ -5,10 +5,13 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 interface IPData {
   address: string;
-  status: string;
+  firstSeen: string;
+  lastSeen: string;
+  status: 'ACTIVE' | 'BLOCKED' | 'MONITORING';
   reputation: {
     virusTotal: {
       score: number;
+      lastUpdate: string;
       detections: string[];
     };
     abuseIPDB: {
@@ -19,25 +22,31 @@ interface IPData {
   geoLocation: {
     country: string;
     city: string;
-    coordinates: number[];
+    coordinates: [number, number];
     isp: string;
     asn: string;
+  };
+  services: {
+    ports: number[];
+    protocols: string[];
+    banners: string[];
+  };
+  monitoring?: {
+    enabled: boolean;
+    interval: number;
+    lastCheck: string;
+    alerts: {
+      timestamp: string;
+      type: string;
+      description: string;
+      severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+    }[];
   };
   aiAnalysis: {
     riskScore: number;
     findings: string[];
     recommendations: string[];
-  };
-  monitoring?: {
-    enabled: boolean;
-    interval: number;
-    lastCheck: Date;
-    alerts: {
-      timestamp: Date;
-      type: string;
-      description: string;
-      severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-    }[];
+    lastAnalysis: string;
   };
 }
 
@@ -146,13 +155,6 @@ export const useIPStore = defineStore('ip', {
     },
 
     clearError() {
-      this.error = null;
-    },
-
-    resetState() {
-      this.currentIP = null;
-      this.monitoredIPs = [];
-      this.loading = false;
       this.error = null;
     }
   }
