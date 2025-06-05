@@ -10,3 +10,139 @@
 {"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T14:17:48.474Z"}
 {"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T14:17:48.475Z"}
 {"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T14:17:48.475Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T14:55:18.189Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T14:55:18.193Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T14:55:18.193Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T14:55:18.193Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T14:57:05.234Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T14:57:05.238Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T14:57:05.239Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T14:57:05.239Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T14:57:26.162Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T14:57:26.167Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T14:57:26.168Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T14:57:26.169Z"}
+{"level":"error","message":"Failed to initialize Groq: LLM_API_KEY environment variable is missing","stack":"Error: LLM_API_KEY environment variable is missing\n    at Object.<anonymous> (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\src\\services\\externalAPIService.ts:12:11)\n    at Module._compile (node:internal/modules/cjs/loader:1565:14)\n    at Module.m._compile (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\node_modules\\ts-node\\src\\index.ts:1618:23)\n    at node:internal/modules/cjs/loader:1708:10\n    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n    at Module.load (node:internal/modules/cjs/loader:1318:32)\n    at Function._load (node:internal/modules/cjs/loader:1128:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:219:24)\n    at Module.require (node:internal/modules/cjs/loader:1340:12)","timestamp":"2025-06-05T14:59:36.801Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T14:59:37.010Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T14:59:37.015Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T14:59:37.016Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T14:59:37.016Z"}
+{"level":"error","message":"Failed to initialize Groq: LLM_API_KEY environment variable is missing","stack":"Error: LLM_API_KEY environment variable is missing\n    at Object.<anonymous> (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\src\\services\\externalAPIService.ts:12:11)\n    at Module._compile (node:internal/modules/cjs/loader:1565:14)\n    at Module.m._compile (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\node_modules\\ts-node\\src\\index.ts:1618:23)\n    at node:internal/modules/cjs/loader:1708:10\n    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n    at Module.load (node:internal/modules/cjs/loader:1318:32)\n    at Function._load (node:internal/modules/cjs/loader:1128:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:219:24)\n    at Module.require (node:internal/modules/cjs/loader:1340:12)","timestamp":"2025-06-05T15:01:14.348Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:01:14.469Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:01:14.470Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:01:14.471Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:01:14.471Z"}
+{"level":"error","message":"Failed to initialize Groq: LLM_API_KEY environment variable is missing","stack":"Error: LLM_API_KEY environment variable is missing\n    at Object.<anonymous> (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\src\\services\\externalAPIService.ts:12:11)\n    at Module._compile (node:internal/modules/cjs/loader:1565:14)\n    at Module.m._compile (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\node_modules\\ts-node\\src\\index.ts:1618:23)\n    at node:internal/modules/cjs/loader:1708:10\n    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n    at Module.load (node:internal/modules/cjs/loader:1318:32)\n    at Function._load (node:internal/modules/cjs/loader:1128:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:219:24)\n    at Module.require (node:internal/modules/cjs/loader:1340:12)","timestamp":"2025-06-05T15:02:28.979Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:02:29.145Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:02:29.146Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:02:29.146Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:02:29.146Z"}
+{"level":"error","message":"Failed to initialize Groq: LLM_API_KEY environment variable is missing","stack":"Error: LLM_API_KEY environment variable is missing\n    at Object.<anonymous> (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\src\\services\\externalAPIService.ts:12:11)\n    at Module._compile (node:internal/modules/cjs/loader:1565:14)\n    at Module.m._compile (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\node_modules\\ts-node\\src\\index.ts:1618:23)\n    at node:internal/modules/cjs/loader:1708:10\n    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n    at Module.load (node:internal/modules/cjs/loader:1318:32)\n    at Function._load (node:internal/modules/cjs/loader:1128:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:219:24)\n    at Module.require (node:internal/modules/cjs/loader:1340:12)","timestamp":"2025-06-05T15:02:43.308Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:02:43.461Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:02:43.462Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:02:43.463Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:02:43.463Z"}
+{"level":"error","message":"Failed to initialize Groq: LLM_API_KEY environment variable is missing","stack":"Error: LLM_API_KEY environment variable is missing\n    at Object.<anonymous> (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\src\\services\\externalAPIService.ts:12:11)\n    at Module._compile (node:internal/modules/cjs/loader:1565:14)\n    at Module.m._compile (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\node_modules\\ts-node\\src\\index.ts:1618:23)\n    at node:internal/modules/cjs/loader:1708:10\n    at Object.require.extensions.<computed> [as .ts] (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\node_modules\\ts-node\\src\\index.ts:1621:12)\n    at Module.load (node:internal/modules/cjs/loader:1318:32)\n    at Function._load (node:internal/modules/cjs/loader:1128:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:219:24)\n    at Module.require (node:internal/modules/cjs/loader:1340:12)","timestamp":"2025-06-05T15:03:16.147Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:03:16.313Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:03:16.314Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:03:16.314Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:03:16.315Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:03:22.575Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:03:22.579Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:03:22.580Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:03:22.580Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:05:46.890Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:05:46.894Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:05:46.895Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:05:46.896Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:07:58.791Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:07:58.796Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:07:58.797Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:07:58.797Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:08:40.735Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:08:40.739Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:08:40.739Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:08:40.740Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:09:45.285Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:09:45.289Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:09:45.290Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:09:45.290Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:10:06.370Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:10:06.377Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:10:06.378Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:10:06.378Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:17:09.300Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:17:09.303Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:17:09.304Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:17:09.304Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:17:21.969Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:17:21.973Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:17:21.974Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:17:21.974Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:25:15.292Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:25:15.296Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:25:15.296Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:25:15.297Z"}
+{"cause":{"commonWireVersion":0,"compatible":true,"heartbeatFrequencyMS":10000,"localThresholdMS":15,"logicalSessionTimeoutMinutes":null,"maxElectionId":null,"maxSetVersion":null,"servers":{"ac-tfgv7k3-shard-00-00.3vxeqyl.mongodb.net:27017":{"$clusterTime":null,"address":"ac-tfgv7k3-shard-00-00.3vxeqyl.mongodb.net:27017","arbiters":[],"electionId":null,"error":{"beforeHandshake":false,"errorLabelSet":{}},"hosts":[],"iscryptd":false,"lastUpdateTime":11459431,"lastWriteDate":0,"logicalSessionTimeoutMinutes":null,"maxBsonObjectSize":null,"maxMessageSizeBytes":null,"maxWireVersion":0,"maxWriteBatchSize":null,"me":null,"minRoundTripTime":0,"minWireVersion":0,"passives":[],"primary":null,"roundTripTime":-1,"setName":null,"setVersion":null,"tags":{},"topologyVersion":null,"type":"Unknown"},"ac-tfgv7k3-shard-00-01.3vxeqyl.mongodb.net:27017":{"$clusterTime":null,"address":"ac-tfgv7k3-shard-00-01.3vxeqyl.mongodb.net:27017","arbiters":[],"electionId":null,"error":{"beforeHandshake":false,"errorLabelSet":{}},"hosts":[],"iscryptd":false,"lastUpdateTime":11459417,"lastWriteDate":0,"logicalSessionTimeoutMinutes":null,"maxBsonObjectSize":null,"maxMessageSizeBytes":null,"maxWireVersion":0,"maxWriteBatchSize":null,"me":null,"minRoundTripTime":0,"minWireVersion":0,"passives":[],"primary":null,"roundTripTime":-1,"setName":null,"setVersion":null,"tags":{},"topologyVersion":null,"type":"Unknown"},"ac-tfgv7k3-shard-00-02.3vxeqyl.mongodb.net:27017":{"$clusterTime":null,"address":"ac-tfgv7k3-shard-00-02.3vxeqyl.mongodb.net:27017","arbiters":[],"electionId":null,"error":{"beforeHandshake":false,"errorLabelSet":{}},"hosts":[],"iscryptd":false,"lastUpdateTime":11459386,"lastWriteDate":0,"logicalSessionTimeoutMinutes":null,"maxBsonObjectSize":null,"maxMessageSizeBytes":null,"maxWireVersion":0,"maxWriteBatchSize":null,"me":null,"minRoundTripTime":0,"minWireVersion":0,"passives":[],"primary":null,"roundTripTime":-1,"setName":null,"setVersion":null,"tags":{},"topologyVersion":null,"type":"Unknown"}},"setName":"atlas-5q53un-shard-0","stale":false,"type":"ReplicaSetNoPrimary"},"errorLabelSet":{},"level":"error","message":"MongoDB connection error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/","reason":{"commonWireVersion":0,"compatible":true,"heartbeatFrequencyMS":10000,"localThresholdMS":15,"logicalSessionTimeoutMinutes":null,"maxElectionId":null,"maxSetVersion":null,"servers":{"ac-tfgv7k3-shard-00-00.3vxeqyl.mongodb.net:27017":{"$clusterTime":null,"address":"ac-tfgv7k3-shard-00-00.3vxeqyl.mongodb.net:27017","arbiters":[],"electionId":null,"error":{"beforeHandshake":false,"errorLabelSet":{}},"hosts":[],"iscryptd":false,"lastUpdateTime":11459431,"lastWriteDate":0,"logicalSessionTimeoutMinutes":null,"maxBsonObjectSize":null,"maxMessageSizeBytes":null,"maxWireVersion":0,"maxWriteBatchSize":null,"me":null,"minRoundTripTime":0,"minWireVersion":0,"passives":[],"primary":null,"roundTripTime":-1,"setName":null,"setVersion":null,"tags":{},"topologyVersion":null,"type":"Unknown"},"ac-tfgv7k3-shard-00-01.3vxeqyl.mongodb.net:27017":{"$clusterTime":null,"address":"ac-tfgv7k3-shard-00-01.3vxeqyl.mongodb.net:27017","arbiters":[],"electionId":null,"error":{"beforeHandshake":false,"errorLabelSet":{}},"hosts":[],"iscryptd":false,"lastUpdateTime":11459417,"lastWriteDate":0,"logicalSessionTimeoutMinutes":null,"maxBsonObjectSize":null,"maxMessageSizeBytes":null,"maxWireVersion":0,"maxWriteBatchSize":null,"me":null,"minRoundTripTime":0,"minWireVersion":0,"passives":[],"primary":null,"roundTripTime":-1,"setName":null,"setVersion":null,"tags":{},"topologyVersion":null,"type":"Unknown"},"ac-tfgv7k3-shard-00-02.3vxeqyl.mongodb.net:27017":{"$clusterTime":null,"address":"ac-tfgv7k3-shard-00-02.3vxeqyl.mongodb.net:27017","arbiters":[],"electionId":null,"error":{"beforeHandshake":false,"errorLabelSet":{}},"hosts":[],"iscryptd":false,"lastUpdateTime":11459386,"lastWriteDate":0,"logicalSessionTimeoutMinutes":null,"maxBsonObjectSize":null,"maxMessageSizeBytes":null,"maxWireVersion":0,"maxWriteBatchSize":null,"me":null,"minRoundTripTime":0,"minWireVersion":0,"passives":[],"primary":null,"roundTripTime":-1,"setName":null,"setVersion":null,"tags":{},"topologyVersion":null,"type":"Unknown"}},"setName":"atlas-5q53un-shard-0","stale":false,"type":"ReplicaSetNoPrimary"},"stack":"MongooseServerSelectionError: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/\n    at _handleConnectionErrors (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\node_modules\\mongoose\\lib\\connection.js:1165:11)\n    at NativeConnection.openUri (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\node_modules\\mongoose\\lib\\connection.js:1096:11)\n    at async connectDB (C:\\Users\\tioir\\OneDrive\\Documents\\ITS\\Semester 4\\KULIAH\\SOC\\FP\\FP-SOC\\backend\\src\\app.ts:33:5)","timestamp":"2025-06-05T15:25:20.592Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:26:58.634Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:26:58.637Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:26:58.638Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:26:58.638Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:28:19.569Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:28:19.572Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:28:19.573Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:28:46.943Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:28:46.947Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:28:46.947Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:31:26.617Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:31:26.620Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:31:26.621Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:32:12.815Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:32:12.818Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:32:12.819Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing","timestamp":"2025-06-05T15:33:48.312Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing","timestamp":"2025-06-05T15:33:48.316Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:33:48.316Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:36:07.941Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:36:07.945Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:36:07.946Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:36:07.946Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:36:29.261Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:36:29.267Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:36:29.268Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:36:29.268Z"}
+{"level":"error","message":"LLM_API_KEY environment variable is missing","timestamp":"2025-06-05T15:37:05.437Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:37:05.441Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:37:05.441Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:37:05.442Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:38:17.460Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:38:17.464Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:38:17.464Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:38:50.104Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:38:50.107Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:38:50.108Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:41:51.964Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:41:51.967Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:41:51.968Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:42:19.530Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:42:19.534Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:42:19.534Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:45:31.818Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:45:31.822Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:45:31.823Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:46:17.574Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:46:17.577Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:46:17.578Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:51:51.154Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:51:51.159Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:51:51.160Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:52:11.051Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:52:11.056Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:52:11.057Z"}
+{"level":"error","message":"VIRUSTOTAL_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:52:22.520Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T15:52:22.526Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing","timestamp":"2025-06-05T15:52:22.526Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid","timestamp":"2025-06-05T16:04:58.353Z"}
+{"level":"error","message":"ABUSEIPDB_API_KEY environment variable is missing or invalid. Current raw value: \"your_abuseipdb_api_key\"","timestamp":"2025-06-05T16:06:45.808Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing or invalid. Current raw value: \"your_shodan_api_key\"","timestamp":"2025-06-05T16:06:45.808Z"}
+{"level":"error","message":"SHODAN_API_KEY environment variable is missing or invalid. Current raw value: \"your_shodan_api_key\"","timestamp":"2025-06-05T16:11:15.556Z"}
