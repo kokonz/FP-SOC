@@ -1,3 +1,4 @@
+<!-- frontend/src/components/IPInvestigation.vue -->
 <template>
   <div class="ip-investigation">
     <div class="search-section card">
@@ -28,7 +29,7 @@
       <!-- Overview Card -->
       <div class="card overview-card">
         <div class="card-header">
-          <h3>Overview</h3>
+          <h3>Overview for {{ currentIP.address }}</h3>
           <div class="risk-indicator">
             <span class="label">Risk Level:</span>
             <span :class="['risk-badge', riskLevelClass]">
@@ -49,33 +50,6 @@
           <div class="stat-item">
             <span class="stat-label">Status</span>
             <span class="stat-value">{{ currentIP.status }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Reputation Analysis -->
-      <div class="card reputation-card">
-        <h3>Reputation Analysis</h3>
-        <div class="reputation-grid">
-          <div class="reputation-item">
-            <h4>VirusTotal</h4>
-            <div class="score-display" :class="getScoreClass(currentIP.reputation.virusTotal.score)">
-              {{ currentIP.reputation.virusTotal.score }}
-            </div>
-            <div class="details">
-              <p>Detections: {{ currentIP.reputation.virusTotal.detections.length }}</p>
-              <p>Last Update: {{ formatDate(currentIP.reputation.virusTotal.lastUpdate) }}</p>
-            </div>
-          </div>
-          
-          <div class="reputation-item">
-            <h4>AbuseIPDB</h4>
-            <div class="score-display" :class="getScoreClass(currentIP.reputation.abuseIPDB.score)">
-              {{ currentIP.reputation.abuseIPDB.score }}
-            </div>
-            <div class="details">
-              <p>Reports: {{ currentIP.reputation.abuseIPDB.reports }}</p>
-            </div>
           </div>
         </div>
       </div>
@@ -101,56 +75,58 @@
             <span>{{ currentIP.geoLocation.asn }}</span>
           </div>
         </div>
-      </div>      <!-- Threat Analysis -->
+      </div>
+
+      <!-- Threat Analysis -->
       <div class="card threat-analysis-card">
-        <h3>Threat Analysis</h3>
+        <h3>Threat Analysis Summary</h3>
         <div class="threat-summary">
-          <div class="threat-severity" :class="getThreatSeverityClass(currentIP?.aiAnalysis?.riskLevel)">
-            <h4>Threat Severity</h4>
-            <div class="severity-score" :class="{ 'pulse': currentIP?.aiAnalysis?.riskScore >= 80 }">
-              {{ currentIP?.aiAnalysis?.riskScore || 0 }}
+          <div class="threat-severity" :class="riskLevelClass">
+            <h4>Risk Score</h4>
+            <div class="severity-score">
+              {{ currentIP.aiAnalysis.riskScore }}
               <span class="severity-label">/ 100</span>
             </div>
-            <div class="severity-level">{{ currentIP?.aiAnalysis?.riskLevel || 'LOW' }}</div>
+            <div class="severity-level">{{ riskLevel }}</div>
           </div>
-          <div class="threat-types">
-            <h4>Threat Classification</h4>
-            <div class="threat-tags">
-              <span 
-                v-for="(type, index) in (currentIP?.aiAnalysis?.threatTypes || ['None Detected'])" 
-                :key="index" 
-                class="threat-tag"
-                :class="getThreatTypeClass(type)"
-                :title="getThreatTypeDescription(type)"
-              >
-                {{ type }}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div class="threat-details">
-          <div class="threat-timeline">
-            <h4>Analysis Timeline</h4>
-            <div class="timeline-item">
-              <span class="timeline-label">First Detection:</span>
-              <span class="timeline-value">{{ currentIP?.firstSeen ? formatDate(currentIP.firstSeen) : 'Not detected' }}</span>
-            </div>
-            <div class="timeline-item">
-              <span class="timeline-label">Last Analyzed:</span>
-              <span class="timeline-value">{{ currentIP?.aiAnalysis?.lastAnalyzed ? formatDate(currentIP.aiAnalysis.lastAnalyzed) : 'Not analyzed yet' }}</span>
-            </div>
-            <div class="timeline-item">
-              <span class="timeline-label">Detection Count:</span>
-              <span class="timeline-value">{{ currentIP?.reputation?.virusTotal?.detections?.length || 0 }} sources</span>
-            </div>
+          <div class="threat-ai-summary">
+            <h4>AI Summary</h4>
+            <p>{{ currentIP.aiAnalysis.summary }}</p>
           </div>
         </div>
       </div>
+      
+      <!-- Bagian Paling Penting: Menampilkan Aktivitas yang Terdeteksi -->
+      <div class="card detected-activities-card">
+        <h3>Detected Activities (Evidence Log)</h3>
+        <div v-if="currentIP.detectedActivities && currentIP.detectedActivities.length > 0" class="activity-table-container">
+          <table class="activity-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Type</th>
+                <th>Source IP</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(activity, index) in currentIP.detectedActivities" :key="index">
+                <td>{{ formatDate(activity.timestamp) }}</td>
+                <td><span class="activity-type-badge">{{ activity.type }}</span></td>
+                <td>{{ activity.sourceIP }}</td>
+                <td class="details-cell">{{ activity.details }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="no-data">
+          <p>No suspicious activities have been logged for this IP address.</p>
+        </div>
+      </div>
 
-      <!-- AI Analysis -->
+      <!-- AI Analysis Details -->
       <div class="card ai-analysis-card">
-        <h3>AI Analysis</h3>
+        <h3>AI Analysis Details</h3>
         <div class="findings-section">
           <h4>Key Findings</h4>
           <ul class="findings-list">
@@ -214,7 +190,6 @@ const loading = ref(false);
 const currentIP = computed(() => ipStore.currentIP);
 const isMonitored = computed(() => currentIP.value?.monitoring?.enabled || false);
 
-// Watch for prop changes and auto-investigate
 watch(() => props.address, (newAddress) => {
   if (newAddress) {
     ipAddress.value = newAddress;
@@ -222,7 +197,6 @@ watch(() => props.address, (newAddress) => {
   }
 });
 
-// Auto-investigate when mounted with an address
 onMounted(() => {
   if (props.address || route.params.address) {
     ipAddress.value = (props.address || route.params.address) as string;
@@ -231,7 +205,7 @@ onMounted(() => {
 });
 
 const riskLevel = computed(() => {
-  if (!currentIP.value) return '';
+  if (!currentIP.value) return 'N/A';
   const score = currentIP.value.aiAnalysis.riskScore;
   if (score >= 80) return 'Critical';
   if (score >= 60) return 'High';
@@ -240,7 +214,7 @@ const riskLevel = computed(() => {
 });
 
 const riskLevelClass = computed(() => {
-  if (!currentIP.value) return '';
+  if (!currentIP.value) return 'risk-low';
   const score = currentIP.value.aiAnalysis.riskScore;
   if (score >= 80) return 'risk-critical';
   if (score >= 60) return 'risk-high';
@@ -248,52 +222,10 @@ const riskLevelClass = computed(() => {
   return 'risk-low';
 });
 
-const getScoreClass = (score: number) => {
-  if (score >= 80) return 'score-critical';
-  if (score >= 60) return 'score-high';
-  if (score >= 40) return 'score-medium';
-  return 'score-low';
-};
-
-const getThreatSeverityClass = (level: string | undefined) => {
-  if (!level) return 'severity-low';
-  
-  switch (level.toUpperCase()) {
-    case 'CRITICAL': return 'severity-critical';
-    case 'HIGH': return 'severity-high';
-    case 'MEDIUM': return 'severity-medium';
-    default: return 'severity-low';
-  }
-};
-
-const getThreatTypeDescription = (type: string): string => {
-  const descriptions: Record<string, string> = {
-    'Malicious Activity': 'Known malicious behavior or attacks detected',
-    'Community Reported Threats': 'Reports from security community members',
-    'Security Vendor Detections': 'Detections from antivirus and security vendors',
-    'Reported Abuse': 'Reported network abuse or malicious activities',
-    'None Detected': 'No threats detected at this time'
-  };
-  return descriptions[type] || 'Unknown threat type';
-};
-
-const getThreatTypeClass = (type: string): string => {
-  const typeMap: Record<string, string> = {
-    'Malicious Activity': 'type-malicious',
-    'Community Reported Threats': 'type-community',
-    'Security Vendor Detections': 'type-security',
-    'Reported Abuse': 'type-abuse',
-    'None Detected': 'type-none'
-  };
-  return typeMap[type] || 'type-default';
-};
-
 const investigate = async () => {
   if (!ipAddress.value) return;
-  
   loading.value = true;
   error.value = '';
-  
   try {
     await ipStore.investigateIP(ipAddress.value);
   } catch (err: any) {
@@ -305,7 +237,6 @@ const investigate = async () => {
 
 const startMonitoring = async () => {
   if (!currentIP.value) return;
-  
   try {
     await ipStore.startMonitoring(currentIP.value.address);
   } catch (err: any) {
@@ -315,7 +246,6 @@ const startMonitoring = async () => {
 
 const stopMonitoring = async () => {
   if (!currentIP.value) return;
-  
   try {
     await ipStore.stopMonitoring(currentIP.value.address);
   } catch (err: any) {
@@ -325,277 +255,51 @@ const stopMonitoring = async () => {
 </script>
 
 <style scoped>
-.ip-investigation {
-  max-width: 1200px;
-  margin: 0 auto;
-}
+/* General Styles */
+.ip-investigation { max-width: 1200px; margin: 0 auto; }
+.search-section, .actions-card { margin-bottom: 2rem; }
+.search-form { display: flex; gap: 1rem; margin-top: 1rem; }
+.search-form input { flex: 1; }
+.results-section { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+.overview-card, .threat-analysis-card, .detected-activities-card, .ai-analysis-card, .actions-card { grid-column: 1 / -1; }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.quick-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.stat-item { display: flex; flex-direction: column; align-items: center; padding: 1rem; background: var(--background-color); border-radius: 0.375rem; }
+.stat-label { font-size: 0.875rem; color: var(--text-muted); }
+.stat-value { font-size: 1.125rem; font-weight: 500; margin-top: 0.5rem; }
+.geo-details { display: grid; gap: 0.75rem; }
+.detail-row { display: flex; justify-content: space-between; padding: 0.5rem; background: var(--background-color); border-radius: 0.375rem; }
 
-.search-section {
-  margin-bottom: 2rem;
-}
+/* Risk Indicator */
+.risk-badge { padding: 0.25rem 0.75rem; border-radius: 1rem; color: white; font-weight: 500; font-size: 0.8rem; }
+.risk-critical { background: var(--error-color); }
+.risk-high { background: var(--warning-color); }
+.risk-medium { background: var(--info-color); }
+.risk-low { background: var(--success-color); }
 
-.search-form {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-}
+/* Threat Analysis Summary */
+.threat-summary { display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; }
+.threat-severity { text-align: center; padding: 1.5rem; border-radius: 0.5rem; color: white; }
+.severity-score { font-size: 2.5rem; font-weight: 700; margin: 1rem 0; }
+.severity-label { font-size: 1rem; opacity: 0.7; }
+.severity-level { font-size: 1.25rem; font-weight: 600; text-transform: uppercase; }
+.threat-ai-summary { padding: 1.5rem; background: var(--background-color); border-radius: 0.5rem; }
+.threat-ai-summary p { margin: 0; line-height: 1.6; }
 
-.search-form input {
-  flex: 1;
-  padding: 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: 0.375rem;
-  font-size: 1rem;
-}
+/* Detected Activities Table */
+.activity-table-container { max-height: 400px; overflow-y: auto; }
+.activity-table { width: 100%; border-collapse: collapse; }
+.activity-table th, .activity-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+.activity-table th { background: var(--background-color); font-weight: 600; }
+.details-cell { font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; color: var(--text-secondary); max-width: 400px; word-break: break-all; }
+.activity-type-badge { padding: 0.2rem 0.5rem; border-radius: 4px; background: #e2e8f0; color: #475569; font-size: 0.8rem; font-weight: 500; }
 
-.results-section {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-}
+/* AI Analysis Details */
+.findings-list, .recommendations-list { list-style-type: disc; padding-left: 1.5rem; }
+.findings-list li, .recommendations-list li { margin-bottom: 0.75rem; line-height: 1.6; }
+.no-data { text-align: center; padding: 2rem; color: var(--text-muted); }
 
-.overview-card {
-  grid-column: 1 / -1;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.quick-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1rem;
-  background: var(--background-color);
-  border-radius: 0.375rem;
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
-
-.stat-value {
-  font-size: 1.125rem;
-  font-weight: 500;
-  margin-top: 0.5rem;
-}
-
-.reputation-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-}
-
-.reputation-item {
-  text-align: center;
-  padding: 1rem;
-  background: var(--background-color);
-  border-radius: 0.375rem;
-}
-
-.score-display {
-  font-size: 2rem;
-  font-weight: 600;
-  margin: 1rem 0;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-}
-
-.details {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-.geo-details,
-.services-list {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem;
-  background: var(--background-color);
-  border-radius: 0.375rem;
-}
-
-.threat-analysis-card {
-  grid-column: 1 / -1;
-}
-
-.threat-summary {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.threat-severity {
-  text-align: center;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  background: var(--background-color);
-}
-
-.severity-score {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin: 1rem 0;
-}
-
-.severity-label {
-  font-size: 1rem;
-  opacity: 0.7;
-}
-
-.severity-level {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-top: 0.5rem;
-}
-
-.threat-types {
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  background: var(--background-color);
-}
-
-.threat-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.threat-tag {
-  padding: 0.5rem 1rem;
-  border-radius: 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.threat-details {
-  margin-top: 1.5rem;
-}
-
-.threat-timeline {
-  padding: 1rem;
-  background: var(--background-color);
-  border-radius: 0.5rem;
-}
-
-.timeline-item {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.5rem;
-}
-
-/* Severity Classes */
-.severity-critical {
-  background: rgba(220, 38, 38, 0.1);
-  color: #dc2626;
-}
-
-.severity-high {
-  background: rgba(234, 88, 12, 0.1);
-  color: #ea580c;
-}
-
-.severity-medium {
-  background: rgba(234, 179, 8, 0.1);
-  color: #ea580c;
-}
-
-.severity-low {
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
-}
-
-/* Threat Type Classes */
-.type-malicious {
-  background: rgba(220, 38, 38, 0.1);
-  color: #dc2626;
-}
-
-.type-community {
-  background: rgba(234, 88, 12, 0.1);
-  color: #ea580c;
-}
-
-.type-security {
-  background: rgba(234, 179, 8, 0.1);
-  color: #eab308;
-}
-
-.type-abuse {
-  background: rgba(147, 51, 234, 0.1);
-  color: #9333ea;
-}
-
-.type-none {
-  background: rgba(107, 114, 128, 0.1);
-  color: #6b7280;
-}
-
-.type-default {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
-}
-
-.ai-analysis-card {
-  grid-column: 1 / -1;
-}
-
-.findings-section,
-.recommendations-section {
-  margin-top: 1rem;
-}
-
-.findings-list,
-.recommendations-list {
-  list-style-type: none;
-  padding: 0;
-  margin: 0.5rem 0;
-}
-
-.findings-list li,
-.recommendations-list li {
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  background: var(--background-color);
-  border-radius: 0.375rem;
-}
-
-.actions-card {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid var(--background-color);
-  border-top: 4px solid var(--primary-color);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+/* Spinner */
+.spinner { width: 40px; height: 40px; border: 4px solid var(--background-color); border-top: 4px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>

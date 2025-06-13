@@ -1,3 +1,5 @@
+// backend/src/controllers/ipController.ts
+
 import { Request, Response, NextFunction } from 'express';
 import { IPInvestigationService } from '../services/ipInvestigationService';
 import IP from '../models/IP';
@@ -26,14 +28,15 @@ export const investigateIP: AsyncRequestHandler = async (req, res, next): Promis
 
 export const startMonitoring: AsyncRequestHandler = async (req, res, next): Promise<void> => {
   try {
-    const { address, interval } = req.body;
+    const { address } = req.body; // <-- DIUBAH: Hanya mengambil 'address'
     
     if (!address) {
       res.status(400).json({ error: 'IP address is required' });
       return;
     }
 
-    const result = await ipService.startMonitoring(address, interval);
+    // <-- DIUBAH: 'interval' tidak lagi dikirimkan, sesuai dengan definisi fungsi yang baru
+    const result = await ipService.startMonitoring(address); 
     res.json(result);
   } catch (error) {
     logger.error('Monitoring start error:', error);

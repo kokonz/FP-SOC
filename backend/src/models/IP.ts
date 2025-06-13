@@ -1,77 +1,68 @@
+// backend/src/models/IP.ts
+
 import mongoose, { Schema, Document } from 'mongoose';
 
+// Interface untuk satu aktivitas yang terdeteksi
+export interface IDetectedActivity {
+  timestamp: Date;
+  type: 'SSH_FAILURE' | 'PORT_SCAN' | 'FIREWALL_BLOCK' | 'MALICIOUS_REQUEST' | 'UNKNOWN';
+  sourceIP: string;
+  details: string; // Log asli atau deskripsi singkat
+}
+
 export interface IIP extends Document {
-  address: string;
+  address: string; // IP yang dimonitor
   firstSeen: Date;
   lastSeen: Date;
   status: 'ACTIVE' | 'BLOCKED' | 'MONITORING';
-  reputation: {
-    virusTotal: {
-      score: number;
-      lastUpdate: Date;
-      detections: string[];
-    };
-    abuseIPDB: {
-      score: number;
-      reports: number;
-    };
-  };
   geoLocation: {
     country: string;
     city: string;
     coordinates: [number, number];
     isp: string;
     asn: string;
-  };  services: {
-    ports: number[];
-    protocols: string[];
-    banners: string[];
-  };
-  scanningActivities: {
-    sshAttempts: number;
-    nmapScans: number;
-    portScans: number;
-    scannerIPs: string[];
-    lastDetected: Date;
   };
   monitoring: {
     enabled: boolean;
-    interval: number;
+    interval?: number; // Interval tidak lagi krusial, karena kita berbasis event
     lastCheck: Date;
     alerts: {
       timestamp: Date;
       type: string;
-      description: string;
+      description:string;
       severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
     }[];
   };
+  // Menggantikan field reputation dan services
+  detectedActivities: IDetectedActivity[];
   aiAnalysis: {
     riskScore: number;
+    summary: string; // Ringkasan ancaman oleh AI
     findings: string[];
     recommendations: string[];
     lastAnalysis: Date;
   };
 }
 
+const DetectedActivitySchema: Schema = new Schema({
+  timestamp: { type: Date, default: Date.now, index: true },
+  type: {
+    type: String,
+    enum: ['SSH_FAILURE', 'PORT_SCAN', 'FIREWALL_BLOCK', 'MALICIOUS_REQUEST', 'UNKNOWN'],
+    required: true
+  },
+  sourceIP: { type: String, required: true, index: true },
+  details: { type: String, required: true }
+});
+
 const IPSchema: Schema = new Schema({
-  address: { type: String, required: true, unique: true },
+  address: { type: String, required: true, unique: true, index: true },
   firstSeen: { type: Date, default: Date.now },
   lastSeen: { type: Date, default: Date.now },
-  status: { 
-    type: String, 
+  status: {
+    type: String,
     enum: ['ACTIVE', 'BLOCKED', 'MONITORING'],
     default: 'ACTIVE'
-  },
-  reputation: {
-    virusTotal: {
-      score: { type: Number, default: 0 },
-      lastUpdate: { type: Date },
-      detections: [String]
-    },
-    abuseIPDB: {
-      score: { type: Number, default: 0 },
-      reports: { type: Number, default: 0 }
-    }
   },
   geoLocation: {
     country: String,
@@ -83,14 +74,9 @@ const IPSchema: Schema = new Schema({
     isp: String,
     asn: String
   },
-  services: {
-    ports: [Number],
-    protocols: [String],
-    banners: [String]
-  },
   monitoring: {
     enabled: { type: Boolean, default: false },
-    interval: { type: Number, default: 3600 }, // Default 1 hour in seconds
+    interval: Number,
     lastCheck: Date,
     alerts: [{
       timestamp: { type: Date, default: Date.now },
@@ -102,8 +88,10 @@ const IPSchema: Schema = new Schema({
       }
     }]
   },
+  detectedActivities: [DetectedActivitySchema],
   aiAnalysis: {
     riskScore: { type: Number, default: 0 },
+    summary: { type: String, default: 'No analysis performed yet.' },
     findings: [String],
     recommendations: [String],
     lastAnalysis: { type: Date }
@@ -112,13 +100,7 @@ const IPSchema: Schema = new Schema({
   timestamps: true
 });
 
-// Create indexes for better query performance
-IPSchema.index({ address: 1 });
-IPSchema.index({ status: 1 });
-IPSchema.index({ 'monitoring.enabled': 1 });
-IPSchema.index({ 'aiAnalysis.riskScore': 1 });
-
-// Pre-save middleware to update lastSeen
+// Pre-save middleware untuk update lastSeen
 IPSchema.pre('save', function(next) {
   this.lastSeen = new Date();
   next();
