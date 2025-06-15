@@ -2,30 +2,43 @@
 
 import axios from 'axios';
 import NodeCache from 'node-cache';
-import { Groq } from 'groq-sdk';
+// import { Groq } from 'groq-sdk';
 import { logger } from '../utils/logger';
 import { GeoIPResponse } from '../types/api';
 import { IDetectedActivity } from '../models/IP';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const cache = new NodeCache({ stdTTL: 3600 });
 
 export class ExternalAPIService {
   private ipGeolocationKey: string;
-  private groq: Groq;
+  private genAI: GoogleGenerativeAI;
+  private model: any;
+  // private groq: Groq;
 
   constructor() {
     logger.info('[ExternalAPIService] Constructor called.');
-    const llmKey = process.env.LLM_API_KEY;
+    // const llmKey = process.env.LLM_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY;
     const geoKey = process.env.IPGEO_API_KEY;
+    
 
     this.ipGeolocationKey = geoKey?.replace(/["']/g, '') || '';
     
-    if (!llmKey || llmKey.trim() === '' || llmKey.includes('your_')) {
-      logger.error('LLM_API_KEY environment variable is missing or invalid');
-      throw new Error('LLM_API_KEY is not configured');
+    // if (!llmKey || llmKey.trim() === '' || llmKey.includes('your_')) {
+    //   logger.error('LLM_API_KEY environment variable is missing or invalid');
+    //   throw new Error('LLM_API_KEY is not configured');
+    // }
+    
+    // this.groq = new Groq({ apiKey: llmKey.replace(/["']/g, '') });
+
+    if (!geminiKey || geminiKey.trim() === '' || geminiKey.includes('your_')) {
+      logger.error('GEMINI_API_KEY environment variable is missing or invalid');
+      throw new Error('GEMINI_API_KEY is not configured');
     }
     
-    this.groq = new Groq({ apiKey: llmKey.replace(/["']/g, '') });
+    this.genAI = new GoogleGenerativeAI(geminiKey.replace(/["']/g, ''));
+    this.model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     if (!this.ipGeolocationKey) {
         logger.warn(`IPGEO_API_KEY is missing. Geolocation data will be unavailable.`);
@@ -93,22 +106,38 @@ export class ExternalAPIService {
         "recommendations": string[]
       }`;
 
-      const completion = await this.groq.chat.completions.create({
-        messages: [{ role: "user", content: userPrompt }],
-        model: "llama3-8b-8192", // Model yang lebih cepat dan cocok untuk tugas ini
-        temperature: 0.3,
-        max_tokens: 1500,
-        top_p: 1,
-        response_format: { type: "json_object" },
-      });
+      // const completion = await this.groq.chat.completions.create({
+      //   messages: [{ role: "user", content: userPrompt }],
+      //   model: "llama3-8b-8192", // Model yang lebih cepat dan cocok untuk tugas ini
+      //   temperature: 0.3,
+      //   max_tokens: 1500,
+      //   top_p: 1,
+      //   response_format: { type: "json_object" },
+      // });
 
-      const content = completion.choices[0]?.message?.content;
-      if (!content) {
-        throw new Error('Empty response from LLM');
+      // const content = completion.choices[0]?.message?.content;
+      // if (!content) {
+      //   throw new Error('Empty response from LLM');
+      // }
+
+      const result = await this.model.generateContent(userPrompt);
+      const response = await result.response;
+      const content = response.text();
+
+      // const parsedResponse = JSON.parse(content);
+      // return { ...parsedResponse, lastAnalyzed: new Date().toISOString() };
+
+      // Clean the response - remove markdown formatting if present
+      const cleanJson = content.replace(/```json\n|\n```|```/g, '').trim();
+      
+      try {
+        const parsedResponse = JSON.parse(cleanJson);
+        return { ...parsedResponse, lastAnalyzed: new Date().toISOString() };
+      } catch (parseError) {
+        logger.error('Failed to parse LLM response:', parseError);
+        logger.debug('Raw LLM response:', content);
+        throw parseError;
       }
-
-      const parsedResponse = JSON.parse(content);
-      return { ...parsedResponse, lastAnalyzed: new Date().toISOString() };
 
     } catch (error) {
       logger.error('LLM Analysis error:', error);
