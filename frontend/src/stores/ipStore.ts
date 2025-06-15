@@ -14,7 +14,7 @@ interface IDetectedActivity {
 }
 
 // Interface IPData yang baru, mencerminkan model backend
-interface IPData {
+export interface IPData {
   _id: string; // MongoDB ID
   address: string;
   firstSeen: string;

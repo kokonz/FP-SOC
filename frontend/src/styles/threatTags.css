@@ -1,0 +1,78 @@
+/* Threat Tags Styles */
+.threat-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.threat-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+}
+
+/* Threat Type Colors */
+.threat-ddos {
+  background-color: #ff4444;
+}
+
+.threat-reconnaissance {
+  background-color: #ffbb33;
+}
+
+.threat-brute-force {
+  background-color: #ff8800;
+}
+
+.threat-exploit {
+  background-color: #cc0000;
+}
+
+.threat-social-engineering {
+  background-color: #aa66cc;
+}
+
+.threat-spam {
+  background-color: #33b5e5;
+}
+
+.threat-malware {
+  background-color: #cc0000;
+}
+
+.threat-other {
+  background-color: #888888;
+}
+
+/* Card Styles */
+.threat-card {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--surface-color);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.threat-findings {
+  margin-top: 1rem;
+}
+
+.findings-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+}
+
+.findings-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.findings-list li:last-child {
+  border-bottom: none;
+}
