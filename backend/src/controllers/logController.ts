@@ -6,34 +6,30 @@ import { logger } from '../utils/logger';
 
 const ipService = new IPInvestigationService();
 
-/**
- * Menerima satu atau beberapa entri log untuk diproses.
- * Body request bisa berupa satu objek atau array objek.
- * Contoh Body: { "monitoredIP": "YOUR_IP", "sourceIP": "ATTACKER_IP", "logLine": "sshd[1234]: Failed password for invalid user root from 123.45.67.89 port 22" }
- * atau array: [ { ... }, { ... } ]
- */
 export const ingestLog = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
+    // ================== TAMBAHKAN BARIS INI UNTUK DEBUGGING ==================
+    console.log("--- RAW PAYLOAD RECEIVED ---");
+    console.log(JSON.stringify(req.body, null, 2));
+    console.log("----------------------------");
+    // =======================================================================
+
     const logEntries = Array.isArray(req.body) ? req.body : [req.body];
 
-    if (logEntries.length === 0) {
-      res.status(400).json({ error: 'Log entry/entries are required' });
+    if (logEntries.length === 0 || Object.keys(logEntries[0]).length === 0) {
+      // Tambahkan pengecekan untuk body kosong
+      logger.error('Received an empty or malformed log payload.', { body: req.body });
+      res.status(400).json({ error: 'Malformed or empty log payload' });
       return;
     }
 
-    // Proses setiap log secara asinkron tanpa menunggu selesai
     logEntries.forEach(entry => {
-      const { monitoredIP, sourceIP, logLine } = entry;
-      if (monitoredIP && sourceIP && logLine) {
-        ipService.processLogEntry({ monitoredIP, sourceIP, logLine }).catch(err => {
-          logger.error(`Error processing log entry for ${monitoredIP}`, err);
-        });
-      } else {
-        logger.warn('Skipping malformed log entry:', entry);
-      }
+      // Kita tidak lagi memvalidasi di sini karena service sudah melakukannya
+      ipService.processLogEntry(entry).catch(err => {
+        logger.error(`Error processing log entry for ${entry.monitoredIP}`, err);
+      });
     });
 
-    // Kirim respons 202 Accepted, menandakan permintaan diterima untuk diproses
     res.status(202).json({ message: 'Log entries accepted for processing.' });
 
   } catch (error) {

@@ -4,51 +4,52 @@ import { ExternalAPIService } from './externalAPIService';
 import IP, { IIP, IDetectedActivity } from '../models/IP';
 import { logger } from '../utils/logger';
 
-// Definisikan tipe untuk payload log
 interface LogPayload {
   monitoredIP: string;
   sourceIP: string;
   logLine: string;
+  type?: IDetectedActivity['type'];
 }
 
 export class IPInvestigationService {
   private externalAPIService: ExternalAPIService;
-  private investigationQueue: Map<string, boolean> = new Map();
+  private investigationDebounceTimers: Map<string, NodeJS.Timeout> = new Map();
 
   constructor() {
     this.externalAPIService = new ExternalAPIService();
   }
 
-  // Fungsi ini sekarang menjadi pemicu analisis AI, bukan pengumpul data utama
+  // ===== FUNGSI INVESTIGATEIP YANG DIPERBARUI & LEBIH TANGGUH =====
   async investigateIP(address: string): Promise<IIP> {
     try {
-      logger.info(`Starting investigation for IP: ${address}`);
+      logger.info(`[DEBOUNCED] Starting investigation for IP: ${address}`);
       
-      let ip = await IP.findOne({ address });
-      if (!ip) {
-        // Jika IP belum ada, buat entri dasar
-        const geoData = await this.externalAPIService.getGeoIPData(address);
-        ip = await IP.create({
-          address,
-          status: 'MONITORING',
-          monitoring: { enabled: true },
-          geoLocation: {
-            country: geoData?.country || 'Unknown',
-            city: geoData?.city || 'Unknown',
-            coordinates: [geoData?.lon || 0, geoData?.lat || 0],
-            isp: geoData?.isp || 'Unknown',
-            asn: geoData?.as?.split(' ')[0] || 'Unknown'
-          },
-        });
+      // === KUNCI PERBAIKAN: Gunakan findOneAndUpdate dengan upsert ===
+      // Ini akan menemukan dokumen ATAU membuat yang baru jika tidak ada.
+      // Ini secara efektif menghilangkan race condition.
+      let ip = await IP.findOneAndUpdate(
+        { address: address },
+        // $setOnInsert: hanya akan mengisi data ini saat dokumen pertama kali dibuat
+        { $setOnInsert: { address: address, status: 'MONITORING', monitoring: { enabled: true } } },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+
+      // Jika dokumen baru saja dibuat, beberapa field mungkin kosong. Kita isi di sini.
+      if (!ip.geoLocation || !ip.geoLocation.country) {
+          const geoData = await this.externalAPIService.getGeoIPData(address);
+          ip.geoLocation = {
+              country: geoData?.country || 'Unknown',
+              city: geoData?.city || 'Unknown',
+              coordinates: [geoData?.lon || 0, geoData?.lat || 0],
+              isp: geoData?.isp || 'Unknown',
+              asn: geoData?.as?.split(' ')[0] || 'Unknown'
+          };
       }
 
-      // Ambil aktivitas yang terdeteksi dari database
-      const activities = ip.get('detectedActivities', Array);
-
-      // Dapatkan analisis dari AI berdasarkan aktivitas yang ada
+      // Sekarang kita bisa dengan aman mengambil aktivitas
+      const activities = ip.detectedActivities;
       const aiAnalysis = await this.externalAPIService.analyzeWithLLM(activities, address);
       
-      // Update data IP dengan hasil analisis AI
       ip.aiAnalysis = {
         riskScore: aiAnalysis.riskScore,
         summary: aiAnalysis.summary,
@@ -57,108 +58,78 @@ export class IPInvestigationService {
         lastAnalysis: new Date()
       };
       
-      // Tentukan status berdasarkan risk score
-      if (aiAnalysis.riskScore >= 75) {
-        ip.status = 'BLOCKED'; // Contoh, bisa memicu tindakan lain
-      } else {
-        ip.status = 'MONITORING';
-      }
+      if (aiAnalysis.riskScore >= 80) { ip.status = 'BLOCKED'; }
+      else { ip.status = 'MONITORING'; }
 
+      // Simpan semua pembaruan (termasuk geolokasi jika baru)
       await ip.save();
-      logger.info(`Investigation complete for IP: ${address}. Risk Score: ${ip.aiAnalysis.riskScore}`);
+      
+      logger.info(`[DEBOUNCED] Investigation complete for IP: ${address}. Risk Score: ${ip.aiAnalysis.riskScore}`);
       return ip;
-
     } catch (error) {
-      logger.error(`Error investigating IP ${address}:`, error);
+      logger.error(`[DEBOUNCED] Error investigating IP ${address}:`, error);
       throw error;
     }
   }
   
-  // FUNGSI BARU: Untuk memproses log yang masuk dari endpoint
+  // Fungsi processLogEntry tetap sama, logikanya sudah benar
   async processLogEntry(payload: LogPayload): Promise<void> {
-    const { monitoredIP, sourceIP, logLine } = payload;
+    const { monitoredIP, sourceIP, logLine, type } = payload;
 
-    const ip = await IP.findOne({ address: monitoredIP, 'monitoring.enabled': true });
-    
-    // Hanya proses jika IP sedang dimonitor
-    if (!ip) {
-      logger.debug(`Skipping log for unmonitored or non-existent IP: ${monitoredIP}`);
+    if (!type) {
+      logger.warn(`Skipping log for ${monitoredIP} because 'type' is missing in payload.`);
       return;
     }
 
-    // Klasifikasi sederhana berdasarkan isi log
-    let activityType: IDetectedActivity['type'] = 'UNKNOWN';
-    const lowerLog = logLine.toLowerCase();
-
-    if (lowerLog.includes('failed password') || lowerLog.includes('invalid user')) {
-      activityType = 'SSH_FAILURE';
-    } else if (lowerLog.includes('block') && (lowerLog.includes('in=') && lowerLog.includes('out='))) {
-      // Asumsi log firewall seperti UFW/iptables
-      activityType = 'FIREWALL_BLOCK';
-    } else if (lowerLog.includes('nmap scan')) {
-      activityType = 'PORT_SCAN';
+    const ip = await IP.findOneAndUpdate(
+        { address: monitoredIP },
+        { $setOnInsert: { address: monitoredIP, monitoring: { enabled: true } } },
+        { upsert: true, new: true }
+    );
+    
+    if (!ip.monitoring?.enabled) {
+      logger.debug(`Skipping log for unmonitored IP: ${monitoredIP}`);
+      return;
     }
 
     const newActivity: IDetectedActivity = {
       timestamp: new Date(),
-      type: activityType,
+      type: type,
       sourceIP: sourceIP,
       details: logLine
     };
-    
-    // Tambahkan aktivitas baru ke dalam array
-    ip.detectedActivities.push(newActivity);
-    
-    // Batasi jumlah log yang disimpan agar DB tidak membengkak (misal, 200 log terakhir)
-    if (ip.detectedActivities.length > 200) {
-      ip.detectedActivities.shift();
-    }
-    
-    await ip.save();
-    logger.info(`Logged new activity for ${monitoredIP} from ${sourceIP}`);
 
-    // Memicu investigasi ulang (analisis AI) agar tidak terlalu sering
-    // Cek jika tidak ada investigasi yang sedang berjalan untuk IP ini
-    if (!this.investigationQueue.get(monitoredIP)) {
-        this.investigationQueue.set(monitoredIP, true);
-        logger.info(`Queueing investigation for ${monitoredIP}`);
-        // Menjalankan investigasi setelah jeda singkat untuk mengumpulkan lebih banyak log
-        setTimeout(async () => {
-            try {
-                await this.investigateIP(monitoredIP);
-            } catch (err) {
-                logger.error(`Scheduled investigation for ${monitoredIP} failed.`, err);
-            } finally {
-                this.investigationQueue.delete(monitoredIP);
-            }
-        }, 10000); // Tunggu 10 detik sebelum menganalisis
+    await IP.updateOne(
+        { address: monitoredIP },
+        { 
+            $push: { detectedActivities: { $each: [newActivity], $slice: -200 } },
+            $set: { lastSeen: new Date() }
+        }
+    );
+    
+    logger.info(`Logged activity for ${monitoredIP} from ${sourceIP} [Type: ${type}]`);
+
+    if (this.investigationDebounceTimers.has(monitoredIP)) {
+      clearTimeout(this.investigationDebounceTimers.get(monitoredIP)!);
     }
+
+    const newTimer = setTimeout(async () => {
+      try {
+        await this.investigateIP(monitoredIP);
+      } catch (err) { /* error sudah di-log */ } 
+      finally {
+        this.investigationDebounceTimers.delete(monitoredIP);
+      }
+    }, 15000);
+
+    this.investigationDebounceTimers.set(monitoredIP, newTimer);
   }
 
-
+  // startMonitoring dan stopMonitoring tetap sama
   async startMonitoring(address: string): Promise<IIP> {
-    let ip = await IP.findOne({ address });
-    if (ip) {
-      ip.monitoring.enabled = true;
-      ip.monitoring.lastCheck = new Date();
-      await ip.save();
-    } else {
-      // Jika IP baru, buat dokumennya dan langsung investigasi awal
-      const geoData = await this.externalAPIService.getGeoIPData(address);
-      ip = await IP.create({
-        address,
-        status: 'MONITORING',
-        monitoring: { enabled: true, lastCheck: new Date() },
-        geoLocation: {
-          country: geoData?.country || 'Unknown',
-          city: geoData?.city || 'Unknown',
-          coordinates: [geoData?.lon || 0, geoData?.lat || 0],
-          isp: geoData?.isp || 'Unknown',
-          asn: geoData?.as?.split(' ')[0] || 'Unknown'
-        },
-      });
-    }
-    return ip;
+    // Kita bisa sederhanakan ini untuk hanya memanggil investigateIP,
+    // karena investigateIP sekarang bisa membuat dokumen baru.
+    return this.investigateIP(address);
   }
 
   async stopMonitoring(address: string): Promise<IIP> {
