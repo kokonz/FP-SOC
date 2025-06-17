@@ -37,7 +37,7 @@ Berikut adalah pembagian tugas untuk proyek **IP Investigation System** dari kel
     > - Pengembangan machine learning models
     > - Analisis behavior patterns
     > - Sistem scoring dan risk assessment
-    > - Integration dengan external APIs (AbuseIPDB, etc.)
+    > - Integration dengan external APIs (GeoLocation)
 ## 📝 Tim Paper Documentation
 
 4. **Rafika Az Zahra K. (5027231050) - Research & Methodology**
@@ -63,10 +63,9 @@ Berikut adalah pembagian tugas untuk proyek **IP Investigation System** dari kel
 ## 🛠️ Tech Stack
 
 - **Frontend:** Vue.js, TypeScript, Vite, Pinia
-- **Backend:** Node.js, Express, TypeScript, MongoDB
+- **Backend:** Node.js, Express, TypeScript, MongoDB, Ngork
 - **AI/ML:** Google Gemini API
 - **Security:** JWT, Rate Limiting, IP Analysis
-- **Tools:** Git, Docker, Jest
 
 ---
 
