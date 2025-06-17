@@ -1,0 +1,92 @@
+﻿AIOps-Powered IP Investigation & Threat Detection System
+ 
+Hazwan Adhikara Nasution¹, Rafael Gunawan², Rafika Az Zahra Kusumastuti³, Tio Axellino Irin⁴, Nisrina Atiqah Dwiputri Ridzki⁵
+¹²³⁴⁵Departemen Teknologi Informasi, Fakultas Elektro dan Informatika Cerdas, Institut Teknologi Sepuluh Nopember, Surabaya
+ 
+ABSTRAK
+Deteksi dan investigasi ancaman siber berbasis alamat IP menjadi salah satu komponen penting dalam sistem keamanan modern, khususnya pada platform Security Information and Event Management (SIEM). Penelitian ini memperkenalkan sistem AIOps-Powered IP Investigation & Threat Detection System, yaitu solusi berbasis kecerdasan buatan yang mampu mendeteksi dan menganalisis log aktivitas IP server secara real-time. Sistem ini terdiri dari tiga komponen utama: backend berbasis Node.js, frontend dengan Vue.js, dan skrip log forwarder yang dijalankan di server target. Backend menerima log melalui endpoint khusus, menyimpannya ke MongoDB, dan memprosesnya dengan mengirimkan prompt ke AI generatif Google Gemini untuk menghasilkan analisis terstruktur berisi skor risiko, klasifikasi serangan, dan saran mitigasi. Frontend menyajikan visualisasi data IP, aktivitas, serta hasil analisis Gemini secara interaktif kepada pengguna. Hasil pengujian menunjukkan bahwa sistem mampu memberikan insight yang akurat dan cepat untuk mendukung proses investigasi keamanan secara otomatis, efisien, dan skalabel.
+Kata Kunci: AIOps, Keamanan Siber, Investigasi IP, Google Gemini, Log Monitoring.
+
+
+ABSTRACT
+This research introduces the AIOps-Powered IP Investigation & Threat Detection System, a cybersecurity solution that utilizes generative AI to analyze IP server activity logs in real-time. The system consists of three main components: a Node.js backend, a Vue.js frontend, and a log forwarder script deployed on the target server. The backend receives logs via a specific endpoint, stores them in MongoDB, and sends a prompt to the Google Gemini model, which returns a structured analysis including risk scores, attack classification, and mitigation recommendations. The frontend provides interactive visualization of IP data, activities, and AI-generated insights to users. Experimental results indicate that the system delivers accurate and timely insights to support efficient, automated cybersecurity investigations.
+Keywords: AIOps, Cybersecurity, IP Investigation, Google Gemini, Log Monitoring.
+________________
+1. PENDAHULUAN
+
+
+Seiring meningkatnya adopsi teknologi digital dan ketergantungan organisasi terhadap infrastruktur TI yang terhubung, ancaman keamanan siber juga berkembang semakin kompleks. Salah satu jenis serangan yang umum terjadi adalah upaya eksploitasi melalui aktivitas IP yang mencurigakan, seperti brute-force login, port scanning, dan web enumeration. Serangan ini biasanya dimulai dengan mengidentifikasi titik lemah sistem melalui pemindaian otomatis, lalu mencoba mengeksploitasinya secara bertahap. Upaya-upaya tersebut jika tidak terdeteksi sejak awal, dapat berkembang menjadi pelanggaran data serius dan menimbulkan kerugian besar.
+Dalam ekosistem keamanan siber modern, pendekatan berbasis reaktif seperti hanya mengandalkan daftar reputasi IP eksternal atau deteksi pola statis sudah tidak memadai. Sistem keamanan informasi seperti Security Information and Event Management (SIEM) kini dituntut untuk dapat beroperasi secara proaktif, cerdas, dan otomatis. Salah satu pendekatan terbaru yang relevan dengan kebutuhan ini adalah AIOps (Artificial Intelligence for IT Operations), yaitu integrasi teknologi AI untuk memantau dan mengelola data operasional sistem TI, termasuk deteksi dan investigasi ancaman berbasis log.
+Penelitian ini bertujuan untuk mengembangkan sebuah sistem deteksi dan investigasi IP mencurigakan berbasis AIOps yang mampu bekerja secara real-time. Sistem ini dibangun dengan arsitektur modular yang terdiri dari backend berbasis Node.js, frontend interaktif dengan Vue.js, serta log forwarder berbasis shell script untuk memantau log server secara langsung. Keunggulan utama dari sistem ini adalah pemanfaatan AI generatif dari Google Gemini yang mampu menganalisis log aktivitas secara otomatis dan memberikan skor risiko, klasifikasi serangan, serta rekomendasi mitigasi dalam format terstruktur.
+Berbeda dari solusi tradisional yang menampilkan log mentah, sistem ini berupaya memberikan insight siap pakai kepada analis keamanan, mempercepat proses investigasi, dan memungkinkan respons yang lebih cepat dan tepat. Dengan pendekatan ini, diharapkan sistem mampu meningkatkan efektivitas deteksi ancaman dan menjadi fondasi dari platform keamanan adaptif di masa mendatang.
+
+
+2. TINJAUAN PUSTAKA
+Beberapa pendekatan telah dilakukan dalam mendeteksi ancaman berbasis log dan data tabular. Sahingoz et al. (2019) menunjukkan efektivitas machine learning untuk klasifikasi phishing URL. Arik & Pfister (2021) memperkenalkan TabNet yang efektif dalam pembelajaran tabular. Namun, belum banyak sistem yang memanfaatkan AI generatif seperti Google Gemini untuk analisis log secara otomatis dalam konteks keamanan siber.
+
+
+3. METODOLOGI
+Penelitian ini bertujuan untuk merancang dan mengimplementasikan sistem deteksi dan investigasi ancaman keamanan siber berbasis AIOps. Sistem dikembangkan untuk memproses log server secara real-time dan menghasilkan analisis otomatis menggunakan model AI generatif dari Google Gemini. Tahapan dalam metodologi ini mencakup desain arsitektur sistem, pengumpulan data log, pemrosesan log, integrasi dengan AI, dan visualisasi hasil ke pengguna melalui antarmuka web.
+3.1 Desain Arsitektur Sistem
+Sistem ini dibangun dengan pendekatan arsitektur tiga lapis: backend, frontend, dan log forwarder. Backend dikembangkan dengan Node.js dan Express.js yang menyediakan endpoint RESTful untuk menerima data log. Data ini disimpan ke dalam MongoDB, dan proses analisis dijadwalkan menggunakan teknik debouncing agar backend tetap responsif meskipun terjadi lonjakan log.
+Frontend dirancang menggunakan framework Vue.js. Antarmuka ini menyajikan visualisasi data log, skor risiko, serta rekomendasi mitigasi dalam bentuk dashboard interaktif. Halaman investigasi per alamat IP juga disediakan, menampilkan detail aktivitas dan insight dari AI.
+Log forwarder merupakan skrip Bash yang dijalankan pada server target. Skrip ini memantau file log seperti /var/log/auth.log dan journalctl, mencari pola serangan seperti brute-force SSH atau pemblokiran firewall (UFW BLOCK). Ketika pola terdeteksi, skrip mengirim data log dalam format JSON ke backend melalui tunneling publik menggunakan Ngrok.
+3.2 Integrasi AI Generatif Google Gemini
+Setelah backend menerima log dan mengakumulasinya, sistem membuat prompt untuk dikirim ke model Google Gemini. Prompt ini berisi log aktivitas dari satu alamat IP yang diklasifikasikan. Google Gemini, sebagai model AI generatif multimodal, merespons dengan analisis ancaman dalam bentuk JSON. Analisis mencakup skor risiko (0–100), level risiko (Low, Medium, High, Critical), ringkasan serangan, serta saran mitigasi yang disarankan.
+Hasil analisis ini disimpan kembali dalam database dan disajikan kepada pengguna melalui antarmuka frontend. Dengan demikian, proses investigasi IP menjadi lebih efisien dan informatif tanpa perlu campur tangan manual dari analis keamanan untuk menginterpretasikan log mentah.
+3.3 Teknologi dan Alat Pendukung
+Penggunaan teknologi pendukung seperti API dari ip-api.com memungkinkan enrichmen data dengan informasi geolokasi (negara, kota, ISP) berdasarkan alamat IP. Teknologi Ngrok digunakan untuk membuka endpoint backend ke publik secara aman, sehingga skrip log_forwarder di server luar dapat berkomunikasi dengan backend secara real-time.
+Secara keseluruhan, metodologi ini menggabungkan pendekatan pemantauan log real-time, arsitektur sistem terdistribusi, dan AI generatif untuk menghadirkan platform deteksi ancaman yang proaktif, otomatis, dan adaptif terhadap serangan baru.
+
+
+4. HASIL DAN PEMBAHASAN
+4.1 Lingkungan Eksperimen
+Seluruh eksperimen dilakukan pada platform pengujian lokal menggunakan server Linux yang diintegrasikan dengan skrip log forwarder dan backend API berbasis Express.js. Proses deteksi dan analisis AI dilakukan melalui API Google Gemini. Infrastruktur backend diuji dalam berbagai kondisi log intensif untuk memastikan kestabilan sistem, sementara analisis dari Gemini dijalankan dalam jaringan internet dengan koneksi aman.
+4.2 Performa Deteksi dan Analisis
+Sistem diuji dengan simulasi serangan brute-force SSH menggunakan alat Hydra. Setelah serangan berhasil dipicu, log forwarder mencatat aktivitas mencurigakan dan mengirimkan data ke backend. Dalam waktu rata-rata < 20 detik, sistem berhasil memproses log, mengirim prompt ke Gemini, dan menerima hasil analisis.
+Gemini memberikan skor risiko tinggi (contohnya 85/100), klasifikasi level "High", serta rekomendasi mitigasi seperti pemblokiran IP, audit konfigurasi SSH, dan penguatan autentikasi. Tingkat kecepatan dan konsistensi respons menunjukkan keandalan alur sistem secara real-time.
+4.3 Visualisasi dan Interaksi Pengguna
+Dashboard frontend menampilkan peta lokasi IP berdasarkan hasil dari ip-api.com, tabel aktivitas mencurigakan, dan rincian log mentah per alamat IP. Halaman investigasi menyajikan semua hasil analisis AI dalam format JSON terstruktur yang mudah diinterpretasikan.
+Visualisasi data memungkinkan pengguna memahami distribusi aktivitas ancaman secara geografis, serta mengidentifikasi alamat IP yang paling sering terlibat dalam aktivitas mencurigakan. Sistem juga memungkinkan pencarian dan pemfilteran berdasarkan jenis serangan dan skor risiko.
+4.4 Evaluasi Stabilitas dan Responsivitas
+Penggunaan debouncing dalam backend terbukti efektif menjaga stabilitas sistem. Meskipun menerima ratusan log dalam hitungan detik, server tetap responsif dan tidak mengalami bottleneck. Hal ini sangat penting dalam lingkungan sistem keamanan informasi dan manajemen kejadian (SIEM) yang membutuhkan pemrosesan cepat.
+4.5 Implikasi Implementasi pada Sistem Keamanan
+Hasil pengujian menunjukkan bahwa sistem ini dapat dengan mudah diintegrasikan dalam alur kerja SIEM. Keunggulan Google Gemini dalam memahami log kompleks membuat proses investigasi lebih efisien. Selain itu, kemampuan sistem dalam memberikan insight instan dan saran mitigasi menjadikannya sangat berguna untuk tim keamanan siber.
+Dalam implementasi nyata, kecepatan deteksi, rendahnya latensi pemrosesan, dan akurasi analisis menjadi kunci. Sistem ini, berkat desain modular dan integrasi AI, siap diadopsi oleh organisasi yang membutuhkan solusi deteksi ancaman berbasis log dengan kemampuan otomatis.
+4.6 Keterbatasan Penelitian
+Meski sistem ini menunjukkan performa yang memuaskan, terdapat beberapa keterbatasan:
+1. Sistem hanya diuji pada lingkungan server Linux dan belum mengakomodasi sistem operasi lain.
+2. Jenis serangan yang diuji masih terbatas pada brute-force SSH dan pemindaian port. Perlu pengujian lebih lanjut terhadap serangan RCE atau SQL injection.
+3. Ketergantungan pada layanan Google Gemini berarti sistem memerlukan konektivitas dan bergantung pada eksternal API, yang bisa menjadi kendala privasi atau biaya.
+Keterbatasan ini memberikan arah pengembangan selanjutnya yang mencakup perluasan cakupan log, integrasi AI lokal, serta peningkatan fleksibilitas dan efisiensi sistem secara keseluruhan.
+
+
+5. KESIMPULAN
+Penelitian ini mengembangkan dan mengevaluasi sistem AIOps-Powered IP Investigation & Threat Detection System, yaitu sistem keamanan siber berbasis AI generatif yang mampu melakukan investigasi dan deteksi ancaman IP secara otomatis melalui analisis log server. Sistem dibangun dengan arsitektur modular yang terdiri dari backend Express.js, frontend Vue.js, dan skrip log forwarder berbasis Bash, serta mengintegrasikan model Google Gemini untuk melakukan analisis risiko dan rekomendasi mitigasi.
+Hasil pengujian menunjukkan bahwa sistem mampu mendeteksi ancaman seperti brute-force SSH dan port scanning secara real-time, memberikan analisis mendalam yang mencakup klasifikasi risiko dan saran mitigasi hanya dalam hitungan detik. Visualisasi interaktif melalui dashboard frontend membantu mempercepat pemahaman analis terhadap potensi ancaman.
+Kebaruan utama dari sistem ini terletak pada integrasi teknologi AI generatif secara langsung dalam proses investigasi log, serta pendekatan debouncing yang menjaga kestabilan sistem selama pemrosesan log intensif. Sistem tidak hanya menampilkan data mentah, tetapi menyajikan wawasan yang actionable.
+Namun, sistem ini masih memiliki beberapa keterbatasan. Evaluasi dilakukan dalam skenario simulasi brute-force pada lingkungan server Linux, dan belum mengakomodasi log dari berbagai jenis layanan lain. Selain itu, ketergantungan terhadap layanan eksternal (Google Gemini) bisa menjadi kendala privasi atau biaya dalam implementasi nyata.
+Untuk pengembangan selanjutnya, disarankan agar penelitian ini diperluas dengan:
+1. Pengujian sistem pada jenis serangan dan dataset log yang lebih bervariasi.
+2. Integrasi dukungan notifikasi real-time seperti Telegram atau email.
+3. Eksplorasi model AI lokal agar sistem dapat berjalan secara mandiri tanpa ketergantungan API eksternal.
+Dengan mempertimbangkan akurasi, kecepatan, dan skalabilitas, sistem ini menunjukkan potensi besar untuk diimplementasikan dalam platform SIEM modern.
+Ketersediaan Kode
+Seluruh kode sumber dan konfigurasi sistem tersedia secara publik di repositori GitHub: https://github.com/kokonz/FP-SOC 
+
+
+6. DAFTAR PUSTAKA
+[1] Google Cloud. (2024). Security with Generative AI: Use AI to accelerate threat detection and response. Retrieved from https://cloud.google.com/security/generative-ai 
+[2] Google DeepMind. (2024). Introducing Gemini: Our most capable AI model. Retrieved from https://deepmind.google/technologies/gemini 
+[3] ip-api.com. (2024). IP Geolocation API Documentation. Retrieved from https://ip-api.com/docs/ 
+[4] Wikipedia. (2024). AIOps. Retrieved from https://en.wikipedia.org/wiki/AIOps 
+[5] Express.js Documentation. (2024). Web framework for Node.js. Retrieved from https://expressjs.com/ 
+[6] Vue.js Documentation. (2024). The Progressive JavaScript Framework. Retrieved from https://vuejs.org/ 
+[7] MongoDB Documentation. (2024). NoSQL database for modern applications. Retrieved from https://www.mongodb.com/docs/ 
+[8] Hydra Tool. (2024). THC-Hydra – A very fast network logon cracker. Retrieved from https://github.com/vanhauser-thc/thc-hydra 
+[9] Gemini API by Google AI. (2024). Secure large language model inference. Retrieved from https://ai.google.dev/ 
+[10] Ngrok. (2024). Secure Tunnels to localhost. Retrieved from https://ngrok.com/ 
+[11] Sahingoz, O. K., Buber, E., Demir, O., & Diri, B. (2019). Machine learning based phishing detection from URLs. Expert Systems with Applications, 117, 345–357. https://doi.org/10.1016/j.eswa.2018.09.029 
+[12] Arik, S. Ö., & Pfister, T. (2021). TabNet: Attentive interpretable tabular learning. Proceedings of the AAAI Conference on Artificial Intelligence, 35(8), 6679–6687. https://ojs.aaai.org/index.php/AAAI/article/view/17024 
+[13] Tamal, M. A., Islam, M. K., Bhuiyan, T., & Sattar, A. (2024). Dataset of suspicious phishing URL detection. Frontiers in Computer Science, 6, 1308634. https://doi.org/10.3389/fcomp.2024.1308634 
+[14] Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting system. Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, 785–794. https://doi.org/10.1145/2939672.2939785
